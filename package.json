@@ -1,0 +1,27 @@
+{
+  "name": "challenge-booksapi-nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/server.js",
+  "scripts": {
+    "start": "node ./dist/server.js",
+    "debug": "nodemon ./dist/server.js",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dyrionn/challenge-booksapi-nodejs.git"
+  },
+  "keywords": [
+    "api",
+    "nodejs",
+    "challenge",
+    "crud",
+    "firebase"
+  ],
+  "author": "Artur Pianor",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
