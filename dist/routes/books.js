@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const requestPromise = require('request-promise');
 var booksservice = require('../services/booksservice')
 
 
@@ -60,19 +61,17 @@ router.get('/books/:id', function(req, res, next) {
 
 router.get('/books', function(req, res, next) {
 
-    var jsonResponse = "";
+    booksservice.getFromExternalSource(function(callback){
 
-    try {
-        jsonResponse = booksservice.getById(req.params.id)
-        res.statusCode = 200;
-    } catch (error) {
-        console.error(error);
-        jsonResponse = error.toString();
-        res.statusCode = 500;
-    }
-
-    res.send(jsonResponse);
-    res.end();
+        if (callback == null | callback == undefined) {
+            res.statusCode = 500;
+            res.send(new Error('[{"Message": "Failure during external source request"}]'));
+            res.end();
+        }
+        
+        res.send(callback);
+        res.end();
+    });
 });
 
 module.exports = router;
