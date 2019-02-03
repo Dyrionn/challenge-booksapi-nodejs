@@ -5,14 +5,13 @@ var booksservice = require('../services/booksservice')
 
 
 router.post('/book', function(req, res, next) {
-    console.log('3000 / book');
     booksservice.Add(req.body, function(callback){
         var response = "";
     
         try {
             res.statusCode = callback.statusCode;
-            response = callback.body;
-            console.log(response + " statuscode: " + res.statusCode + callback.body);
+            response = callback.body[Object.keys(callback.body).length -1];
+            console.log(response + " statuscode: " + res.statusCode);
         } catch (error) {
             res.statusCode = 500;
             response = new Error('[{"Message": "Failure during ' + callback.body.method + ' request => ' + callback.body.uri + '},{"Error: ' + error.toString() + '}]');
