@@ -6,10 +6,10 @@ API netcore que expõe livros
   - WebSite crawl
   
 ## Como rodar a aplicação? 
-**Pré-requisitos:**
+#### Pré-requisitos :
 - [Node.js SDK](https://nodejs.org/en/)
 
-**Execução**
+#### Execução :
 Navegar até a raiz do repositorio via linha de comando 
 - Restaurar pacotes : npm install 
 - Iniciar a aplicação : npm start 
