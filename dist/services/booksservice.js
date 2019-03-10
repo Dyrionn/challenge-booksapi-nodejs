@@ -1,7 +1,8 @@
 const cheerio = require('cheerio');
 const requestPromise = require('request-promise');
-const request = require('request');
 const fetch = require('node-fetch');
+const serviceUtils = require('../utils/service-utils')
+
 const firebaseServer = 'https://challenge-books-api.firebaseio.com/Team-Awesome/Books';
 
 exports.Add = function(book, externalCallback){
@@ -83,6 +84,11 @@ exports.getFromExternalSource = async function(callback){
 
                 bookList.push(book);
             }
+            
+        var haveIsbn = await bookList.filter(x => x.isbn != "Unavailable");
+        var donthaveIsbn = await bookList.filter(x => x.isbn == "Unavailable");
+        console.log(haveIsbn.length + 'haveIsbn');
+        console.log(donthaveIsbn.length + 'donthaveIsbn')
 
         callback(bookList);
     }
@@ -95,39 +101,15 @@ async function searchBookIsbn(book, urlToSearchIsbn){
         if (response.status == 200) {
             let responseBodyString = await response.text();
 
-            book.isbn = await getIsbnUsingSimpleNumberExtraction(responseBodyString, false);
+            book.isbn = await serviceUtils.findNumberAroundTag(responseBodyString, 'isbn', false);
             
-            if (book.isbn != "Unavailable") {
-                book.isbn = await getIsbnUsingSimpleNumberExtraction(responseBodyString, true);
+            if (book.isbn == "") {
+                book.isbn = await serviceUtils.findNumberAroundTag(responseBodyString, 'isbn', true);
             }
         }
     } catch (error) {
         console.log(error);
     }
-}
-
-
-function getIsbnUsingSimpleNumberExtraction(stringValue, reverseIndexSearch){
-
-    let tagLocationIndex = stringValue.indexOf('isbn') > -1 ? stringValue.indexOf('isbn') : stringValue.indexOf('ISBN');
-
-    if (tagLocationIndex == -1) {
-        return "Unavailable";
-    }
-
-    let isbnValue = '';
-
-    let tagToSearchIndex = reverseIndexSearch ? tagLocationIndex - 50 : tagLocationIndex;
-
-    let internalSubstring = stringValue.substr(tagToSearchIndex, 50).trim();
-
-    isbnValue = internalSubstring.replace(/\D+/g, "");
-
-    if (isbnValue.length != 13 && tagLocationIndex == -1) {
-        isbnValue = "Unavailable";
-    }
-
-    return isbnValue;
 }
 
 function handleFirebaseRequests(httpMethod, callback, firebaseUrlParams = null, resource = null, json = ""){
