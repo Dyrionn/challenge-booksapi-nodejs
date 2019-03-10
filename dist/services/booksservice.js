@@ -46,9 +46,8 @@ exports.getFromExternalSource = async function(callback){
     if (response.status == 200) {
         const $ =  cheerio.load(body);
 
-            let bruteBooksData = [];
-            $('.book-lang').map(function(index, element) {
-                bruteBooksData.push($(this));
+            let bruteBooksData = $('.book-lang').map(function(){
+                return $(this);
             });
 
             for (let i = 0; i < bruteBooksData.length; i++) {
@@ -84,50 +83,51 @@ exports.getFromExternalSource = async function(callback){
 
                 bookList.push(book);
             }
-            console.log("Cabei qui");
-        
-        console.log('OVER');
+
         callback(bookList);
     }
-
 }
 
 async function searchBookIsbn(book, urlToSearchIsbn){
+    try {
+        let response = await fetch(urlToSearchIsbn);
 
-    let response = await fetch(urlToSearchIsbn);
+        if (response.status == 200) {
+            let responseBodyString = await response.text();
 
-    if (response.status == 200) {
-        let siteString = await response.text();
-        // siteString = siteString.toLowerCase();
-        let tagIndex = siteString.indexOf('isbn')
-        let tagIndexCapital = siteString.indexOf('ISBN')
-
-
-        //just for logs
-        let loginternalstring = '';
-        //end
-
-        if (tagIndex > -1) {
-            let internalSubstring = siteString.substr(tagIndex, 50).trim();
-
-            book.isbn = internalSubstring.replace(/\D+/g, "");
-
-            loginternalstring = internalSubstring;
+            book.isbn = await getIsbnUsingSimpleNumberExtraction(responseBodyString, false);
+            
+            if (book.isbn != "Unavailable") {
+                book.isbn = await getIsbnUsingSimpleNumberExtraction(responseBodyString, true);
+            }
         }
-        else if (tagIndexCapital > -1) {
-            let internalSubstring = siteString.substr(tagIndexCapital, 50).trim();
-
-            book.isbn = internalSubstring.replace(/\D+/g, "");
-
-            loginternalstring = internalSubstring;
-        }
-        
-        if (book.isbn.length != 13) {
-            book.isbn = "Unavailable";
-        }
-
-        console.log('isbn ' + book.isbn + ' index found '+ tagIndex + ', ' + tagIndexCapital, '|' +  loginternalstring + '|' + urlToSearchIsbn);
+    } catch (error) {
+        console.log(error);
     }
+}
+
+
+function getIsbnUsingSimpleNumberExtraction(stringValue, reverseIndexSearch){
+
+    let tagLocationIndex = stringValue.indexOf('isbn') > -1 ? stringValue.indexOf('isbn') : stringValue.indexOf('ISBN');
+
+    if (tagLocationIndex == -1) {
+        return "Unavailable";
+    }
+
+    let isbnValue = '';
+
+    let tagToSearchIndex = reverseIndexSearch ? tagLocationIndex - 50 : tagLocationIndex;
+
+    let internalSubstring = stringValue.substr(tagToSearchIndex, 50).trim();
+
+    isbnValue = internalSubstring.replace(/\D+/g, "");
+
+    if (isbnValue.length != 13 && tagLocationIndex == -1) {
+        isbnValue = "Unavailable";
+    }
+
+    return isbnValue;
 }
 
 function handleFirebaseRequests(httpMethod, callback, firebaseUrlParams = null, resource = null, json = ""){
