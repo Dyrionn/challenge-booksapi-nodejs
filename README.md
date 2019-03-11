@@ -1,16 +1,20 @@
+This readme is available in
+| [EN](./README.md) | [PT-br](./README-pt-br.md) |
+
 # challenge-booksapi-nodejs
-API netcore que expõe livros
+Netcore API to expose books
 
 ## Features :
-  - Semi-crud (sem opção de editar ou deletar por enquanto)
+  - Semi-crud (no editing or deleting for now)
   - WebSite crawl
   
-## Como rodar a aplicação? 
-#### Pré-requisitos :
+## How to run? 
+#### Prerequisites :
 - [Node.js SDK](https://nodejs.org/en/)
 
-#### Execução :
-Navegar até a raiz do repositorio via linha de comando 
-- Restaurar pacotes : npm install 
-- Iniciar a aplicação : npm start 
+#### Execution :
+Navigate to the repository main folder by command line
+- Restore packages : npm install
+- Start application : npm start
 
+OBS: Configuration already included to run debug and tests via pelo Visual Studio Code (F5).
